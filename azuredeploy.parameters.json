@@ -1,0 +1,60 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "SentiaSAType": {
+      "value": "Standard_LRS"
+    },
+    "StorageAccountName": {
+      "value": "Sentia-StorageAccount"
+    },
+    "blobEncryptionEnabled": {
+      "value": true
+    },
+    "fileEncryptionEnabled": {
+      "value": true
+    },
+    "vnetName": {
+      "value": "Sentia-VirtualNetwork"
+    },
+    "SentiaTestNetworkPrefix": {
+      "value": "172.16.0.0/12"
+    },
+    "SentiaTestNetworkSubnet1Prefix": {
+      "value": "172.16.5.0/12"
+    },
+    "SentiaTestNetworkSubnet1Name": {
+      "value": "SentiaSubNet1"
+    },
+    "SentiaTestNetworkSubnet2Prefix": {
+      "value": "172.16.10.0/12"
+    },
+    "SentiaTestNetworkSubnet2Name": {
+      "value": "SentiaSubnet2"
+    },
+    "SentiaTestNetworkSubnet3Prefix": {
+      "value": "172.16.10.0/12"
+    },
+    "SentiaTestNetworkSubnet3Name": {
+      "value": "SentiaSubnet3"
+    },
+    "Sentia-SRVName": {
+      "value": "Sentia-SRV01"
+    },
+    "Sentia-SRVAdminUserName": {
+      "value": "Administrator"
+    },
+    "Sentia-SRVAdminPassword": {
+      "reference": {
+        "keyVault": {
+          "id": "Imaginary_ID_Leading_To_Earlier_Created_KeyVault"
+        },
+        "secretName": "Imaginary_NewAdminPassword"
+      }
+    },
+    "Sentia-SRVWindowsOSVersion": {
+      "value": "2016-Datacenter"
+    }
+
+  }
+}

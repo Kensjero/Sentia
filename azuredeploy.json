@@ -1,0 +1,263 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "SentiaSAType": {
+      "type": "string",
+      "defaultValue": "Standard_LRS",
+      "allowedValues": [
+        "Standard_LRS",
+        "Standard_ZRS",
+        "Standard_GRS",
+        "Standard_RAGRS",
+        "Premium_LRS"
+      ]
+    },
+    "StorageAccountName": {
+      "type": "string",
+      "metadata": {
+        "Description": "The name of the storage account"
+      }
+    },
+    "blobEncryptionEnabled": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Enable or disable Blob encryption at Rest."
+      }
+    },
+    "fileEncryptionEnabled": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Enable or disable Blob encryption at Rest."
+      }
+    },
+    "vnetName": {
+      "type": "string",
+      "defaultValue": "VNet1",
+      "metadata": {
+        "description": "VNet name"
+      }
+    },
+    "SentiaTestNetworkPrefix": {
+      "type": "string",
+      "defaultValue": "10.0.0.0/16",
+      "metadata": {
+        "description": "Address prefix"
+      }
+    },
+    "SentiaTestNetworkSubnet1Prefix": {
+      "type": "string",
+      "defaultValue": "10.0.0.0/24",
+      "metadata": {
+        "description": "Subnet 1 Prefix"
+      }
+    },
+    "SentiaTestNetworkSubnet1Name": {
+      "type": "string",
+      "defaultValue": "Subnet1",
+      "metadata": {
+        "description": "Subnet 1 Name"
+      }
+    },
+    "SentiaTestNetworkSubnet2Prefix": {
+      "type": "string",
+      "defaultValue": "10.0.1.0/24",
+      "metadata": {
+        "description": "Subnet 2 Prefix"
+      }
+    },
+    "SentiaTestNetworkSubnet2Name": {
+      "type": "string",
+      "defaultValue": "Subnet2",
+      "metadata": {
+        "description": "Subnet 2 Name"
+      }
+    },
+    "SentiaTestNetworkSubnet3Prefix": {
+      "type": "string",
+      "defaultValue": "10.0.1.0/24",
+      "metadata": {
+        "description": "Subnet 2 Prefix"
+      }
+    },
+    "SentiaTestNetworkSubnet3Name": {
+      "type": "string",
+      "defaultValue": "Subnet2",
+      "metadata": {
+        "description": "Subnet 2 Name"
+      }
+    },
+    "Sentia-SRVName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "Sentia-SRVAdminUserName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "Sentia-SRVAdminPassword": {
+      "type": "securestring"
+    },
+    "Sentia-SRVWindowsOSVersion": {
+      "type": "string",
+      "defaultValue": "2012-R2-Datacenter",
+      "allowedValues": [
+        "2012-R2-Datacenter",
+        "2016-Nano-Server",
+        "2016-Datacenter-with-Containers",
+        "2016-Datacenter"
+      ]
+    }
+
+  },
+  "variables": {
+    "SentiaSAName": "[concat('SentiaSA', uniqueString(resourceGroup().id))]",
+    "Sentia-SRVImagePublisher": "MicrosoftWindowsServer",
+    "Sentia-SRVImageOffer": "WindowsServer",
+    "Sentia-SRVOSDiskName": "Sentia-SRVOSDisk",
+    "Sentia-SRVVmSize": "Standard_D2_v2",
+    "Sentia-SRVVnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'SentiaTestNetwork')]",
+    "Sentia-SRVSubnetRef": "[concat(variables('Sentia-SRVVnetID'), '/subnets/', Parameters('SentiaTestNetworkSubnet1Name'))]",
+    "Sentia-SRVStorageAccountContainerName": "vhds",
+    "Sentia-SRVNicName": "[concat(parameters('Sentia-SRVName'), 'NetworkInterface')]"
+},
+  "resources": [
+    {
+      "name": "[variables('SentiaSAName')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2016-01-01",
+      "sku": {
+        "name": "[parameters('SentiaSAType')]"
+      },
+      "dependsOn": [],
+      "tags": {
+        "displayName": "SentiaSA"
+      },
+      "properties": {
+        "encryption": {
+          "keySource": "Microsoft.Storage",
+          "services": {
+            "file": {
+              "enabled": true
+            },
+            "blob": {
+              "enabled": true
+            }
+          }
+        }
+      },
+      "kind": "Storage"
+    },
+    {
+      "name": "SentiaTestNetwork",
+      "type": "Microsoft.Network/virtualNetworks",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2016-03-30",
+      "dependsOn": [ ],
+      "tags": {
+        "displayName": "SentiaTestNetwork"
+      },
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[Parameters('SentiaTestNetworkPrefix')]"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "[Parameters('SentiaTestNetworkSubnet1Name')]",
+            "properties": {
+              "addressPrefix": "[Parameters('SentiaTestNetworkSubnet1Prefix')]"
+            }
+          },
+          {
+            "name": "[Parameters('SentiaTestNetworkSubnet2Name')]",
+            "properties": {
+              "addressPrefix": "[Parameters('SentiaTestNetworkSubnet2Prefix')]"
+            }
+          },
+          {
+            "name": "[Parameters('SentiaTestNetworkSubnet3Name')]",
+            "properties": {
+              "addressPrefix": "[Parameters('SentiaTestNetworkSubnet3Prefix')]"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[variables('Sentia-SRVNicName')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2016-03-30",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'SentiaTestNetwork')]"
+      ],
+      "tags": {
+        "displayName": "Sentia-SRVNic"
+      },
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "subnet": {
+                "id": "[variables('Sentia-SRVSubnetRef')]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[parameters('Sentia-SRVName')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('SentiaSAName'))]",
+        "[resourceId('Microsoft.Network/networkInterfaces', variables('Sentia-SRVNicName'))]"
+      ],
+      "tags": {
+        "displayName": "Sentia-SRV"
+      },
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[variables('Sentia-SRVVmSize')]"
+        },
+        "osProfile": {
+          "computerName": "[parameters('Sentia-SRVName')]",
+          "adminUsername": "[parameters('Sentia-SRVAdminUsername')]",
+          "adminPassword": "[parameters('Sentia-SRVAdminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[variables('Sentia-SRVImagePublisher')]",
+            "offer": "[variables('Sentia-SRVImageOffer')]",
+            "sku": "[parameters('Sentia-SRVWindowsOSVersion')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "Sentia-SRVOSDisk",
+            "vhd": {
+              "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('SentiaSAName')), '2016-01-01').primaryEndpoints.blob, variables('Sentia-SRVStorageAccountContainerName'), '/', variables('Sentia-SRVOSDiskName'), '.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('Sentia-SRVNicName'))]"
+            }
+          ]
+        }
+      }
+    }],
+  "outputs": {}
+}
