@@ -1,4 +1,4 @@
-﻿<##################################################################################
+<##################################################################################
 # THIS SCRIPT AND IT'S COMPONENTS HAVE NOT BEEN TESTED. EVERYTHING IS THEORATICAL!#
 ##################################################################################>
 
@@ -11,11 +11,22 @@ $ErrorActionPreference = "Stop"
 [string]$BasePath = "https://raw.githubusercontent.com/Kensjero/Sentia/master"
 [Hashtable]$RGtag = @{Environment='Test'; Company='Sentia'}
 
-# Defining the username and password, and storing this into a variable.
+# Creating a keyvault for authentication and security purposes. Normally this would be done outside of the script for obvious reasons.
+New-AzureRmKeyVault -VaultName $VaultName -ResourceGroupName $RGname -Location $Location
+
+# Storing my password into the vault, this should be done outside of the main script as well.
+Set-AzureKeyVaultSecret -VaultName $VaultName -Name "AdminPassword" -SecretValue (Get-Credential).Password
+
+# Enabling template-deployment for this keyvault, so we can access it from a JSON template.
+Set-AzureRmKeyVaultAccessPolicy -VaultName $VaultName -ResourceGroupName $RGname -EnabledForTemplateDeployment
+
+# Defining the username, and storing this into a variable.
 $User = "Administrator"
+
+# Retrieving the admin password from our key vault, which is a secure manner fo storing credentials.
 $Password = Get-AzureKeyVaultSecret -VaultName $VaultName -Name "AdminPassword"
 
-# Building the PS Credential object in a secure manner.
+# Building the PS Credential object.
 $Cred = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList ($User, $password.SecretValue) 
 
 #Login to our imaginary Azure account.
@@ -48,15 +59,6 @@ New-AzureRmPolicyAssignment -Name 'RestrictResourceTypes' -Scope $rg.ResourceId 
 
 # Assigning policy to our subscription. 
 New-AzureRmPolicyAssignment -Name 'RestrictResourceTypes' -Scope $Subscription.Id -PolicyDefinition $Definition
-
-# Creating a keyvault for authentication and security purposes. Normally this would be done outside of the script for obvious reasons.
-New-AzureRmKeyVault -VaultName $VaultName -ResourceGroupName $RGname -Location $Location
-
-# Storing my password into the vault, this should be done outside of the main script as well.
-Set-AzureKeyVaultSecret -VaultName $VaultName -Name "AdminPassword" -SecretValue (Get-Credential).Password
-
-# Enabling template-deployment for this keyvault.
-Set-AzureRmKeyVaultAccessPolicy -VaultName $VaultName -ResourceGroupName $RGname -EnabledForTemplateDeployment
 
 # Testing the deployment before actually deploying. Due to a lack of license I'm not certain on whichi value I could filter. 
 $TestResult = Test-AzureRmResourceGroupDeployment
