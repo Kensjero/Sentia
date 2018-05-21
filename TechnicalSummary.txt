@@ -1,0 +1,29 @@
+Familiar technologies:
+- Powershell
+
+Newly learned technologies:
+- JSON files
+- Template and parameter files
+- Azure policies
+- Azure Key Vault
+- Azure Storage
+
+Assumptions:
+- The deployment component (.ps1) contains comment-blocks describing all the actions done.
+- It wasn't specified wether the used credentials must be stored safe, we did this anyway (curiousity).
+- Since I couldn't test anything, I verified my JSON fiels through https://jsonlint.com/, and assumed it would be OK.
+
+(Storage):
+- resilience put to LRS. In a test environment we don't need constant-availability.
+- We put encryption on both the blobs and the files.
+
+(Vnet):
+- We didn't know for what the subnets were used, so we just generically named them, and gave them generic IP ranges. 
+
+(NIC):
+- We didn't configure a PIP, neither made any changes varying from default in this area since there are no further actions required with the NIC. 
+
+(VM)
+- We assumed the range of accepted OS to be 2012 R2 +. but made the OS 2016 DC instead. This is of course the latest stable build.
+- We hardcoded the image published to be strictly from MS (MicrosoftWindowsServer). This due to security purposes.
+- We assumed the size to be Standard_D2_v2 since there wasn't any need for optimization in any aspect (e.g. computing, graphic load).
