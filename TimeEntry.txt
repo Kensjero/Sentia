@@ -1,0 +1,23 @@
+To be honest, I'm not sure how accurate this time entry is. Please keep in mind, that I had to double-check twice since I couldn't test my work.
+
+Sat: 
+13:00 - 18:00: Pluralsight, skipping ahead to the usefull sections, awesome!
+18:00 - 23:00(yeah, really..): Figuring out JSON files and structure etc..
+23:00 - 02:00: Created my own JSON template in Visual Studio (not pirated, I swear!)
+02:00 - 04:00: Reading documentation from MS. Fell asleep.
+
+Obviously had brakes inbetween, but its just an estimate.
+
+Sun:
+13:00 - 15:00: Further Pluralsighting
+15:00 - 19:00(yeah, really...): Figuring out how in the hell these template files and parameter files work... Also policies..
+19:00 - 23:00: Figured it out (sorta) and created a first VM. (in my head since I couldn't actually reate one) 
+23:00- 24:00: Embraced my imaginary VM, and made some more!
+
+Mon:
+12:00 - 13:00: Mentally preparing
+13:00 - 17:00: Building policy, deployment script, JSON template and parameter files, triple checking everything, writing up documentation, uploading last pieces to GitHub. 
+
+
+Actual time spent should be around 20 hours. 
+Next deployment ETA (not actually arriving anywere but whatever, sound cool.): 5 - 10 hours (didn't master it yet)
