@@ -33,7 +33,7 @@
       "value": "SentiaSubnet2"
     },
     "SentiaTestNetworkSubnet3Prefix": {
-      "value": "172.16.10.0/12"
+      "value": "172.16.15.0/12"
     },
     "SentiaTestNetworkSubnet3Name": {
       "value": "SentiaSubnet3"
